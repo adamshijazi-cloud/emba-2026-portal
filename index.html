@@ -317,32 +317,6 @@
     border-color: transparent;
   }
 
-  /* Team filter pills */
-  .team-filters {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-  }
-  .team-pill {
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: 20px;
-    padding: 6px 14px;
-    font-size: 12px;
-    font-family: var(--font-sans);
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all var(--transition);
-    font-weight: 500;
-  }
-  .team-pill:hover { border-color: var(--accent); color: var(--accent); }
-  .team-pill.active {
-    background: var(--accent-soft);
-    color: var(--accent-soft-text);
-    border-color: transparent;
-  }
-
   /* ============ Directory ============ */
   .directory-grid {
     display: grid;
@@ -404,10 +378,6 @@
     padding: 2px 8px;
     border-radius: 4px;
     text-transform: uppercase;
-  }
-  .dir-tag.team {
-    background: var(--tag-green-bg);
-    color: var(--tag-green-text);
   }
   .dir-tag.city {
     background: var(--tag-sand-bg);
@@ -705,10 +675,6 @@
       <span class="stat-label">Classmates</span>
     </div>
     <div class="stat">
-      <span class="stat-number">10</span>
-      <span class="stat-label">Teams</span>
-    </div>
-    <div class="stat">
       <span class="stat-number">1</span>
       <span class="stat-label">Upcoming Event</span>
     </div>
@@ -749,7 +715,7 @@
           <svg class="card-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           <span>Class snapshot</span>
         </div>
-        <p class="card-history-text"><strong>61 classmates</strong> across 10 teams — profiles being built out now.</p>
+        <p class="card-history-text"><strong>61 classmates</strong> — profiles being built out now.</p>
         <a href="#classmates" class="card-link">Browse directory</a>
       </div>
     </div>
@@ -767,8 +733,6 @@
       <button class="filter-btn" data-filter="a-m" onclick="setAlphaFilter('a-m', this)">A–M</button>
       <button class="filter-btn" data-filter="n-z" onclick="setAlphaFilter('n-z', this)">N–Z</button>
     </div>
-
-    <div class="team-filters" id="teamFilters"></div>
 
     <div class="directory-grid" id="directoryGrid">
       <div class="loading-indicator">Loading directory...</div>
@@ -829,78 +793,77 @@
 <script>
 // ── Configuration ──
 // To connect a Google Sheet: publish it as CSV, then paste the URL below.
-// The sheet should have columns: First Name, Last Name, Team, Room, Role / Title, Company, City, Province / Country, Birthday (Month), Birthday (Day), LinkedIn URL, Photo URL, Bio
+// The sheet should have columns: First Name, Last Name, Role / Title, Company, City, Province / Country, Birthday (Month), Birthday (Day), LinkedIn URL, Photo URL, Bio, Email, Phone
 const SHEET_CSV_URL = ''; // paste your published Google Sheet CSV URL here
 
 // ── Fallback data (used when no sheet is connected) ──
 const FALLBACK_DATA = [
-  {first:"Faheem",last:"Ahmed",team:"3",room:"303"},
-  {first:"Michael",last:"Anderson",team:"10",room:"414"},
-  {first:"Sean",last:"Anderson",team:"1",room:"301"},
-  {first:"Sheila",last:"Avari",team:"10",room:"414"},
-  {first:"Shannon",last:"Blaylock",team:"9",room:"413"},
-  {first:"Patrice",last:"Caron",team:"3",room:"303"},
-  {first:"Bhrigs",last:"Chadha",team:"3",room:"303"},
-  {first:"Russ",last:"Champaner",team:"2",room:"302"},
-  {first:"Zohaib",last:"Chaudhary",team:"7",room:"411"},
-  {first:"Weina",last:"Chong",team:"2",room:"302"},
-  {first:"Angela",last:"Cutulenco",team:"9",room:"413"},
-  {first:"Jason",last:"deVos",team:"10",room:"414"},
-  {first:"Jasmine",last:"Dhoot",team:"5",room:"317"},
-  {first:"Jonathan",last:"Dickinson",team:"2",room:"302"},
-  {first:"Vanessa",last:"Duffley",team:"1",room:"301"},
-  {first:"Ingrid",last:"Eleosida",team:"4",room:"316"},
-  {first:"Joe",last:"Galeano",team:"9",room:"413"},
-  {first:"Liz",last:"George-Antone",team:"6",room:"318"},
-  {first:"Ben",last:"Hatch",team:"9",room:"413"},
-  {first:"Adam",last:"Hijazi",team:"5",room:"317"},
-  {first:"Mike",last:"Hinbest",team:"8",room:"412"},
-  {first:"Maya",last:"Hohmann",team:"7",room:"411"},
-  {first:"Ben",last:"Hong",team:"6",room:"318"},
-  {first:"Nida",last:"Hussain",team:"8",room:"412"},
-  {first:"Muizz",last:"Jamil",team:"4",room:"316"},
-  {first:"Danny",last:"Khoury",team:"4",room:"316"},
-  {first:"Adam",last:"Klaponski",team:"4",room:"316"},
-  {first:"Blue",last:"Knox",team:"2",room:"302"},
-  {first:"Mehak",last:"Kochhar",team:"7",room:"411"},
-  {first:"Steve",last:"Kurtz",team:"9",room:"413"},
-  {first:"Gem",last:"Lee-Herder",team:"1",room:"301"},
-  {first:"Seva",last:"Lisouski",team:"5",room:"317"},
-  {first:"Eric",last:"Mallory",team:"1",room:"301"},
-  {first:"Jeff",last:"Maltez",team:"8",room:"412"},
-  {first:"Masimba",last:"Mandiwanza",team:"1",room:"301"},
-  {first:"Jake",last:"Martin White",team:"9",room:"413"},
-  {first:"Rob",last:"Merlevede",team:"8",room:"412"},
-  {first:"Babak",last:"Minoosepehr",team:"6",room:"318"},
-  {first:"Sarah",last:"Morris",team:"1",room:"301"},
-  {first:"Christopher",last:"Nabeta",team:"7",room:"411"},
-  {first:"Shelly",last:"Nasution-Moffat",team:"10",room:"414"},
-  {first:"Mike",last:"Nixon",team:"5",room:"317"},
-  {first:"Kelechi",last:"Okechukwu",team:"7",room:"411"},
-  {first:"Jaeson",last:"Patron",team:"10",room:"414"},
-  {first:"Emman",last:"Price",team:"3",room:"303"},
-  {first:"Shahwaiz",last:"Rehman",team:"5",room:"317"},
-  {first:"Mike",last:"Renaud",team:"10",room:"414"},
-  {first:"Joelle",last:"Robitaille",team:"5",room:"317"},
-  {first:"Julia",last:"Rodionova",team:"6",room:"318"},
-  {first:"Brennan",last:"Roy-Bertin",team:"6",room:"318"},
-  {first:"Amanda",last:"Santo",team:"3",room:"303"},
-  {first:"Pamela",last:"Sehdev",team:"8",room:"412"},
-  {first:"Ampreet",last:"Singh",team:"7",room:"411"},
-  {first:"Heather",last:"Smiles",team:"4",room:"316"},
-  {first:"Jerome",last:"Smith",team:"6",room:"318"},
-  {first:"Shakka",last:"Subero",team:"3",room:"303"},
-  {first:"Jordan",last:"Visco",team:"4",room:"316"},
-  {first:"Steven",last:"Wheeler",team:"2",room:"302"},
-  {first:"Ann",last:"Wu",team:"2",room:"302"},
-  {first:"Bryan",last:"Ysebaert",team:"8",room:"412"},
-  {first:"Aaron",last:"Yu",team:"3",room:"303"}
+  {first:"Faheem",last:"Ahmed"},
+  {first:"Michael",last:"Anderson"},
+  {first:"Sean",last:"Anderson"},
+  {first:"Sheila",last:"Avari"},
+  {first:"Shannon",last:"Blaylock"},
+  {first:"Patrice",last:"Caron"},
+  {first:"Bhrigs",last:"Chadha"},
+  {first:"Russ",last:"Champaner"},
+  {first:"Zohaib",last:"Chaudhary"},
+  {first:"Weina",last:"Chong"},
+  {first:"Angela",last:"Cutulenco"},
+  {first:"Jason",last:"deVos"},
+  {first:"Jasmine",last:"Dhoot"},
+  {first:"Jonathan",last:"Dickinson"},
+  {first:"Vanessa",last:"Duffley"},
+  {first:"Ingrid",last:"Eleosida"},
+  {first:"Joe",last:"Galeano"},
+  {first:"Liz",last:"George-Antone"},
+  {first:"Ben",last:"Hatch"},
+  {first:"Adam",last:"Hijazi"},
+  {first:"Mike",last:"Hinbest"},
+  {first:"Maya",last:"Hohmann"},
+  {first:"Ben",last:"Hong"},
+  {first:"Nida",last:"Hussain"},
+  {first:"Muizz",last:"Jamil"},
+  {first:"Danny",last:"Khoury"},
+  {first:"Adam",last:"Klaponski"},
+  {first:"Blue",last:"Knox"},
+  {first:"Mehak",last:"Kochhar"},
+  {first:"Steve",last:"Kurtz"},
+  {first:"Gem",last:"Lee-Herder"},
+  {first:"Seva",last:"Lisouski"},
+  {first:"Eric",last:"Mallory"},
+  {first:"Jeff",last:"Maltez"},
+  {first:"Masimba",last:"Mandiwanza"},
+  {first:"Jake",last:"Martin White"},
+  {first:"Rob",last:"Merlevede"},
+  {first:"Babak",last:"Minoosepehr"},
+  {first:"Sarah",last:"Morris"},
+  {first:"Christopher",last:"Nabeta"},
+  {first:"Shelly",last:"Nasution-Moffat"},
+  {first:"Mike",last:"Nixon"},
+  {first:"Kelechi",last:"Okechukwu"},
+  {first:"Jaeson",last:"Patron"},
+  {first:"Emman",last:"Price"},
+  {first:"Shahwaiz",last:"Rehman"},
+  {first:"Mike",last:"Renaud"},
+  {first:"Joelle",last:"Robitaille"},
+  {first:"Julia",last:"Rodionova"},
+  {first:"Brennan",last:"Roy-Bertin"},
+  {first:"Amanda",last:"Santo"},
+  {first:"Pamela",last:"Sehdev"},
+  {first:"Ampreet",last:"Singh"},
+  {first:"Heather",last:"Smiles"},
+  {first:"Jerome",last:"Smith"},
+  {first:"Shakka",last:"Subero"},
+  {first:"Jordan",last:"Visco"},
+  {first:"Steven",last:"Wheeler"},
+  {first:"Ann",last:"Wu"},
+  {first:"Bryan",last:"Ysebaert"},
+  {first:"Aaron",last:"Yu"}
 ];
 
 // ── State ──
 let classmates = [];
 let alphaFilter = 'all';
-let teamFilter = 'all';
 
 // ── CSV Parser ──
 function parseCSV(text) {
@@ -911,8 +874,6 @@ function parseCSV(text) {
 
   const iFirst = col('First');
   const iLast = col('Last');
-  const iTeam = col('Team');
-  const iRoom = col('Room');
   const iRole = col('Role') !== -1 ? col('Role') : col('Title');
   const iCompany = col('Company');
   const iCity = col('City');
@@ -922,6 +883,8 @@ function parseCSV(text) {
   const iLinkedin = col('LinkedIn');
   const iPhoto = col('Photo');
   const iBio = col('Bio');
+  const iEmail = col('Email');
+  const iPhone = col('Phone');
 
   const result = [];
   for (let i = 1; i < lines.length; i++) {
@@ -933,8 +896,6 @@ function parseCSV(text) {
     if (!first && !last) continue;
     result.push({
       first, last,
-      team: get(iTeam),
-      room: get(iRoom),
       role: get(iRole),
       company: get(iCompany),
       city: get(iCity),
@@ -943,7 +904,9 @@ function parseCSV(text) {
       bdayDay: get(iBdayDay),
       linkedin: get(iLinkedin),
       photo: get(iPhoto),
-      bio: get(iBio)
+      bio: get(iBio),
+      email: get(iEmail),
+      phone: get(iPhone)
     });
   }
   return result;
@@ -964,30 +927,8 @@ async function loadData() {
     classmates = FALLBACK_DATA;
   }
   document.getElementById('statClassmates').textContent = classmates.length;
-  buildTeamFilters();
   renderDirectory();
   renderBirthdays();
-}
-
-// ── Team filter pills ──
-function buildTeamFilters() {
-  const teams = [...new Set(classmates.map(c => c.team).filter(Boolean))].sort((a,b) => +a - +b);
-  const container = document.getElementById('teamFilters');
-  container.innerHTML = '<button class="team-pill active" onclick="setTeamFilter(\'all\', this)">All teams</button>';
-  teams.forEach(t => {
-    const btn = document.createElement('button');
-    btn.className = 'team-pill';
-    btn.textContent = 'Team ' + t;
-    btn.onclick = () => setTeamFilter(t, btn);
-    container.appendChild(btn);
-  });
-}
-
-function setTeamFilter(t, btn) {
-  teamFilter = t;
-  document.querySelectorAll('.team-pill').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderDirectory();
 }
 
 function setAlphaFilter(f, btn) {
@@ -1016,7 +957,6 @@ function renderDirectory() {
     if (query && !searchable.includes(query)) return false;
     if (alphaFilter === 'a-m' && getSortKey(c)[0] > 'M') return false;
     if (alphaFilter === 'n-z' && getSortKey(c)[0] < 'N') return false;
-    if (teamFilter !== 'all' && c.team !== teamFilter) return false;
     return true;
   });
 
@@ -1047,7 +987,6 @@ function renderDirectory() {
     const linkedinHtml = c.linkedin ? `<a href="${c.linkedin}" target="_blank" rel="noopener" class="dir-linkedin" title="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 118.3 6.5a1.78 1.78 0 01-1.8 1.75zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0013 14.19V19h-3v-9h2.9v1.3a3.11 3.11 0 012.7-1.4c1.55 0 3.36.86 3.36 3.66z"/></svg></a>` : '';
 
     let tagsHtml = '';
-    if (c.team) tagsHtml += `<span class="dir-tag team">Team ${c.team}</span>`;
     if (c.city) tagsHtml += `<span class="dir-tag city">${c.city}</span>`;
 
     card.innerHTML = `
